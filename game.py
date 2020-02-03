@@ -1,6 +1,5 @@
 import pygame
 import random
-
 from pygame.locals import (
     RLEACCEL,
     K_w,
@@ -13,12 +12,12 @@ from pygame.locals import (
     K_UP,
     K_ESCAPE,
     KEYDOWN,
-    QUIT,
+    QUIT
+
 )
 
 
 class Player(pygame.sprite.Sprite):
-
     def __init__(self):
         super(Player, self).__init__()
         self.surf = pygame.image.load("textures/fighters.png").convert()
@@ -85,13 +84,28 @@ class Cloud(pygame.sprite.Sprite):
             )
         )
 
-
     def update(self):
         self.rect.move_ip(-5, 0)
         if self.rect.right < 0:
             self.kill()
 
 
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Bullet, self).__init__()
+        self.surf = pygame.Surface((10, 5))
+        self.surf.fill((255, 255, 255))
+        self.rect = self.surf.get_rect(
+            center=(
+                random.randint(SCREEN_WIDTH + 20, SCREEN_WIDTH + 100),
+                random.randint(0, SCREEN_HEIGHT)
+            )
+        )
+
+    def update(self):
+        self.rect.move_ip(5, 0)
+        if self.rect.left < 0:
+            self.kill()
 
 
 clock = pygame.time.Clock()
@@ -105,11 +119,14 @@ ADDENEMY = pygame.USEREVENT + 1
 pygame.time.set_timer(ADDENEMY, 250)
 ADDCLOUD = pygame.USEREVENT + 2
 pygame.time.set_timer(ADDCLOUD, 1000)
+ADDBULLET = pygame.USEREVENT + 3
+pygame.time.set_timer(ADDBULLET, 250)
 
 player = Player()
 
 enemies = pygame.sprite.Group()
 clouds = pygame.sprite.Group()
+bullets = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 
@@ -136,10 +153,16 @@ while running:
             clouds.add(new_cloud)
             all_sprites.add(new_cloud)
 
+        elif event.type == ADDBULLET:
+            new_bullet = Bullet()
+            bullets.add(new_bullet)
+            all_sprites.add(new_bullet)
+
     pressed_keys = pygame.key.get_pressed()
     player.update(pressed_keys)
     enemies.update()
     clouds.update()
+    bullets.update()
 
     screen.fill((66, 194, 245))
 
@@ -149,6 +172,9 @@ while running:
     if pygame.sprite.spritecollideany(player, enemies):
         player.kill()
         running = False
+
+    elif pygame.sprite.spritecollideany(new_bullet, enemies):
+        enemies.kill()
 
     pygame.display.flip()
 
