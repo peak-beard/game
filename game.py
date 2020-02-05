@@ -16,11 +16,8 @@ from pygame.locals import (
     QUIT
 
 )
-class GameOver(pygame.sprite.Sprite):
-    def __init__(self):
-        super(GameOver, self).__init__()
-        self.surf = pygame.image.load("textures/game over.jpg").covert()
-        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+
+
 
 
 class Player(pygame.sprite.Sprite):
@@ -102,11 +99,14 @@ pygame.init()
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 800
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+score = 0
 
 ADDENEMY = pygame.USEREVENT + 1
 pygame.time.set_timer(ADDENEMY, 250)
 ADDCLOUD = pygame.USEREVENT + 2
 pygame.time.set_timer(ADDCLOUD, 1000)
+SCORE = pygame.USEREVENT + 3
+pygame.time.set_timer(SCORE, 1000)
 
 
 player = Player()
@@ -138,6 +138,11 @@ while running:
             new_cloud = Cloud()
             clouds.add(new_cloud)
             all_sprites.add(new_cloud)
+
+        elif event.type == SCORE:
+            score = score + 1
+            print(score)
+
 
     pressed_keys = pygame.key.get_pressed()
     player.update(pressed_keys)
