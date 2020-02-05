@@ -23,7 +23,7 @@ from pygame.locals import (
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
-        self.surf = pygame.image.load("textures/fighters.png").convert()
+        self.surf = pygame.image.load("textures/airship.png").convert()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         pygame.transform.scale(self.surf, (10, 2))
         self.rect = self.surf.get_rect()
@@ -59,8 +59,9 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super(Enemy, self).__init__()
-        self.surf = pygame.Surface((20, 10))
-        self.surf.fill((0, 0, 0))
+        self.surf = pygame.image.load("textures/missile1.png").convert()
+        self.surf.set_colorkey((66, 194, 245), RLEACCEL)
+        pygame.transform.scale(self.surf, (10, 2))
         self.rect = self.surf.get_rect(
             center=(
                 random.randint(SCREEN_WIDTH + 20, SCREEN_WIDTH + 100),
@@ -99,7 +100,12 @@ pygame.init()
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 800
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption('Game')
 score = 0
+font = pygame.font.Font('fonts/Roboto-Black.ttf', 32)
+text = font.render("Hello world", True, (235, 64, 52))
+textRect = text.get_rect()
+
 
 ADDENEMY = pygame.USEREVENT + 1
 pygame.time.set_timer(ADDENEMY, 250)
@@ -153,6 +159,8 @@ while running:
 
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect)
+
+    screen.blit(text, textRect)
 
     if pygame.sprite.spritecollideany(player, enemies):
         player.kill()
