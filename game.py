@@ -1,6 +1,5 @@
 import pygame
 import random
-import time
 from pygame.locals import (
     RLEACCEL,
     K_w,
@@ -14,9 +13,7 @@ from pygame.locals import (
     K_ESCAPE,
     KEYDOWN,
     QUIT
-
 )
-
 
 
 
@@ -102,8 +99,9 @@ SCREEN_HEIGHT = 800
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Game')
 score = 0
+
 font = pygame.font.Font('fonts/Roboto-Black.ttf', 32)
-text = font.render("Hello world", True, (235, 64, 52))
+text = font.render("Game Over!", True, (235, 64, 52))
 textRect = text.get_rect()
 
 
@@ -113,6 +111,8 @@ ADDCLOUD = pygame.USEREVENT + 2
 pygame.time.set_timer(ADDCLOUD, 1000)
 SCORE = pygame.USEREVENT + 3
 pygame.time.set_timer(SCORE, 1000)
+GAMEOVER = pygame.USEREVENT + 4
+gameover_event = pygame.event.Event(GAMEOVER, message="Game over!")
 
 
 player = Player()
@@ -124,6 +124,8 @@ all_sprites.add(player)
 
 
 running = True
+gameover = False
+
 
 while running:
 
@@ -134,6 +136,12 @@ while running:
 
         elif event.type == QUIT:
             running = False
+
+        elif event.type == GAMEOVER:
+            gameover = True
+            screen.fill((255, 255, 255))
+            player.kill()
+            screen.blit(text, textRect)
 
         elif event.type == ADDENEMY:
             new_enemy = Enemy()
@@ -146,28 +154,25 @@ while running:
             all_sprites.add(new_cloud)
 
         elif event.type == SCORE:
-            score = score + 1
-            print(score)
+            if gameover == False:
 
+                score = score + 1
+                print(score)
 
     pressed_keys = pygame.key.get_pressed()
     player.update(pressed_keys)
     enemies.update()
     clouds.update()
 
-    screen.fill((66, 194, 245))
+    if pygame.sprite.spritecollideany(player, enemies) or gameover:
+        pygame.event.post(gameover_event)
 
-    for entity in all_sprites:
-        screen.blit(entity.surf, entity.rect)
+    else:
 
-    screen.blit(text, textRect)
+        screen.fill((66, 194, 245))
 
-    if pygame.sprite.spritecollideany(player, enemies):
-        player.kill()
-        print('Game over!')
-        time.sleep(1.5)
-        running = False
-
+        for entity in all_sprites:
+            screen.blit(entity.surf, entity.rect)
     pygame.display.flip()
 
     clock.tick(30)
